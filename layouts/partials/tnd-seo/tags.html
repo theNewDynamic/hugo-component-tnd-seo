@@ -1,0 +1,165 @@
+{{/* 
+	Print SEO meta tags for a given page
+	
+	@author The New Dynamic
+	
+	@access public
+
+	@context Page 
+
+	@example - Go Template
+		{{ partial "tnd-seo/tags" . }}
+
+	TODO:
+		- [ ] Find a reasonable default image when `site.Params.default_image` is not set.
+		- [ ] Twitter can sport "author" handle on top of the site's. Devise a test for author? 
+		- [ ] Add reflect.IsSlice test before using `index` on .Params.images (once 54 is shipped)
+		- [ ] Not sure about image size. Following https://docs.imgix.com/best-practices/improving-seo-traffic, we have a 
+			square of 800x800 */}}
+
+ 
+{{/*------------------------------
+	BUILDING SCRATCH SEO OBJECT
+	------------------------------ */}}
+
+{{- $.Scratch.Set "seo" dict -}}
+{{- $.Scratch.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title ) -}}
+{{- $.Scratch.SetInMap "seo" "description" .Site.Params.Description -}}
+
+ 
+{{/* Dates
+	----------------------------- */}}
+{{- if not .PublishDate.IsZero -}}
+{{- $.Scratch.SetInMap "seo" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00") -}}
+{{- else if not .Date.IsZero -}}
+{{- $.Scratch.SetInMap "seo" "published_time" (.Date.Format "2006-01-02T15:04:05-07:00") -}}
+{{- end -}}
+{{- if not .Lastmod.IsZero -}}
+{{- $.Scratch.SetInMap "seo" "updated_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00") -}}
+{{- end -}}
+
+ 
+{{/* Description
+	---------------------------- */}}
+{{- with .Summary -}}
+	{{- $.Scratch.SetInMap "seo" "description" . -}}
+{{- end -}}
+{{- with .Params.seo.description -}}
+	{{- $.Scratch.SetInMap "seo" "description" . -}}
+{{- end -}}
+
+ 
+{{/* Title
+	---------------------------- */}}
+{{- if .IsHome -}}
+	{{- $.Scratch.SetInMap "seo" "title" .Site.Title -}}
+{{- end -}}
+
+{{/* Site Name
+	---------------------------- */}}
+{{- with .Param "seo.site_name" -}}
+	{{- $.Scratch.SetInMap "seo" "site_name" . -}}
+{{- else -}}
+	{{- $.Scratch.SetInMap "seo" "site_name" .Site.Title -}}
+{{- end -}}
+
+{{/* Twitter
+	---------------------------- */}}
+{{/* TODO: Maybe it should be default? */}}
+{{- $.Scratch.SetInMap "seo" "twitter_card" "summary_large_image" -}}
+
+{{- with .Site.Social.twitter -}}
+	{{- $.Scratch.SetInMap "seo" "twitter_handle" (printf "@%s" .) -}}
+{{- end -}}
+
+{{/* Image
+	---------------------------- */}}
+
+{{- $img := "/uploads/default.jpg" -}}
+{{- with .Site.Params.seo.default_image -}}
+	{{- $img = . -}}
+{{- end -}}
+
+{{- with .Params.seo.image -}}
+	{{- $img = . -}}
+{{ else }}
+	{{/* If no SEO IMAGE is set, we look for the .Params.images slice
+		and use the first one if it has an `image` key */}}
+	{{- with .Params.images -}}
+		{{- with index . 0 -}}
+			{{- with .image -}}
+				{{- $img = . -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{/* imgx: 
+	If we find an `image_url` in site config, it means we're using imgx.
+	We can therefor safely add an imgx query to the image url.
+ */}}
+{{- with .Site.Params.image_url -}}
+	{{- $query := querify "h" "800" "w" "800" "fit" "crop" -}}
+	{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
+	{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
+		{{ $img = partial "_components/image-src-imgx" (dict "src" $img "query" $query) }}
+	{{ end }}
+{{- end -}}
+
+{{- $.Scratch.SetInMap "seo" "image" ($img | absURL) -}}
+
+
+{{/* Type
+	---------------------------- */}}
+{{- $.Scratch.SetInMap "seo" "type" "website" -}}
+
+{{- if in (slice "blog" "news") .Type -}}
+	{{- $.Scratch.SetInMap "seo" "type" "article" -}}
+{{ else if in (slice "article") .Type }}
+	{{- $.Scratch.SetInMap "seo" "type" "event" -}}
+{{- end -}}
+
+
+{{/* Locale
+	---------------------------- */}}
+{{- $.Scratch.SetInMap "seo" "locale" "en_US" -}}
+ 
+{{/*------------------------------
+	RETRIEVING PROJECT'S OWN DATA
+	------------------------------ */}}
+{{- partial "tnd-seo/extend" . -}}
+
+ 
+{{/*------------------------------
+	WRITING TAGS
+	------------------------------ */}}
+{{- $seo := .Scratch.Get "seo" -}}
+
+<title>{{ $seo.title }}</title>
+<meta name="description" content="{{ $seo.description }}">
+<meta property="og:title" content="{{ $seo.title }}">
+<meta property="og:site_name" content="{{ $seo.site_name }}">
+<meta property="og:description" content="{{ $seo.description }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:type" content="{{ $seo.type }}">
+<meta property="og:locale" content="{{ $seo.locale }}">
+<meta property="og:image" content='{{ $seo.image }}'>
+{{- with ($seo.image_width) -}}
+	<meta property="og:image:width" content="{{ . }}">
+{{- end -}}
+{{- with ($seo.image_height) -}}
+	<meta property="og:image:height" content="{{ . }}">
+{{- end -}}
+<meta name="twitter:card" content="{{ $seo.twitter_card }}">
+<meta name="twitter:title" content="{{- $seo.title }}">
+
+{{ with $seo.twitter_handle }}
+	<meta name="twitter:site" content="{{- . }}">
+	<meta name="twitter:creator" content="{{- . }}">
+{{ end }}
+	<meta name="twitter:description" content="{{- $seo.description }}">
+<meta name="twitter:image" content="{{- $seo.image }}">
+<meta property="article:published_time" content="{{- $seo.published_time }}">
+{{- with $seo.updated_time }}
+	<meta property="article:updated_time" content="{{- $seo.updated_time }}">
+{{- end }}

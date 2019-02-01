@@ -1,0 +1,21 @@
+
+{{/* 
+	Add/Edit SEO Scratch Object
+	
+	@author The New Dynamic
+	
+	@access public
+
+	@context Page 
+
+	User does not load the partial, as the component will. 
+	This allows to overwrite some SEO object keys with project's own.
+
+	@example - In Partial
+		{{ if eq "Type" "recipe" }}
+		{{ .Scratch.SetInMap "seo" "type" "article" }}
+		{{ end }}
+
+		{{- $locales := dict "fr" "fr_FR" "en" "en_US" -}}
+		{{- .Scratch.SetInMap "seo" "locale" (index $locales .Lang) -}}
+ */}}

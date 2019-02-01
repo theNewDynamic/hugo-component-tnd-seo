@@ -1,0 +1,17 @@
+{{/* 
+	Retrieve SEO object from a page and returns it as a json string
+	
+	@author The New Dynamic
+	
+	@access public
+
+	@context Page 
+
+	@return SEO object as a json string
+
+	@example - Go Template
+		{{ $seo := partial "tnd-seo/get" . | transform.Unmarshal }}
+ */}}
+{{- with .Scratch.Get "seo" -}}
+	{{- . | jsonify -}}
+{{- end -}}
