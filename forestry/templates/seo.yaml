@@ -1,0 +1,23 @@
+---
+# The following template is a Partial FM Template to be included
+# in other Forestry's FM Templates
+
+label: SEO
+hide_body: false
+is_partial: true
+display_field: seo
+fields:
+- type: field_group
+  name: seo
+  label: SEO
+  fields:
+  - type: file
+    description: This image will be used when sharing on Facebook, Twitter and other
+      social media.
+    label: Image
+    name: image
+  - type: textarea
+    name: description
+    label: Description
+    description: This description will usedhen sharing on Facebook, Twitter and other
+      social media.
