@@ -14,6 +14,7 @@
 		- [ ] Find a reasonable default image when `site.Params.default_image` is not set.
 		- [ ] Twitter can sport "author" handle on top of the site's. Devise a test for author? 
 		- [ ] Add reflect.IsSlice test before using `index` on .Params.images (once 54 is shipped)
+		- [ ] Maybe consider another approach to set the twitter_card (summary, etc...)
 		- [ ] Not sure about image size. Following https://docs.imgix.com/best-practices/improving-seo-traffic, we have a 
 			square of 800x800 */}}
 
@@ -22,10 +23,8 @@
 	BUILDING SCRATCH SEO OBJECT
 	------------------------------ */}}
 
+{{/* Adding the seo map to scratch which will recieve SEO key/value pairs. */}}
 {{- $.Scratch.Set "seo" dict -}}
-{{- $.Scratch.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title ) -}}
-{{- $.Scratch.SetInMap "seo" "description" .Site.Params.Description -}}
-
  
 {{/* Dates
 	----------------------------- */}}
@@ -41,9 +40,16 @@
  
 {{/* Description
 	---------------------------- */}}
+{{/* Default description is the site's description */}}
+{{- $.Scratch.SetInMap "seo" "description" .Site.Params.Description -}}
+
+{{/* If a .Summary is found we use it as description 
+.Summary being built from `.Content`, list pages may not always sport one, hence this test. */}}
 {{- with .Summary -}}
 	{{- $.Scratch.SetInMap "seo" "description" . -}}
 {{- end -}}
+
+{{/* If user's own seo description is set, we use it instead */}}
 {{- with .Params.seo.description -}}
 	{{- $.Scratch.SetInMap "seo" "description" . -}}
 {{- end -}}
@@ -51,6 +57,10 @@
  
 {{/* Title
 	---------------------------- */}}
+{{/* default title: {.Title} | {.Site.Title} */}}
+{{- $.Scratch.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title ) -}}
+
+{{/* Home page only needs `.Site.Title` */}}
 {{- if .IsHome -}}
 	{{- $.Scratch.SetInMap "seo" "title" .Site.Title -}}
 {{- end -}}
@@ -65,12 +75,14 @@
 
 {{/* Twitter
 	---------------------------- */}}
-{{/* TODO: Maybe it should be default? */}}
+{{/* Default twitter_card is "summary_large_image" */}}
 {{- $.Scratch.SetInMap "seo" "twitter_card" "summary_large_image" -}}
 
+{{/* We check the site config sports a Social.twitter and use as handle */}}
 {{- with .Site.Social.twitter -}}
 	{{- $.Scratch.SetInMap "seo" "twitter_handle" (printf "@%s" .) -}}
 {{- end -}}
+
 
 {{/* Image
 	---------------------------- */}}
