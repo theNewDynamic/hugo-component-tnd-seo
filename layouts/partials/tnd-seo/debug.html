@@ -1,0 +1,19 @@
+{{/* 
+	Prints a YAML representation of the SEO object
+	Useful to go through a projects's page and check the formated object (used for og, twitter etc...)
+	Styling uses Tailwind.
+
+	@author the New Dynamic
+	
+	@access public
+
+	@context Page
+
+	@example - Go Template
+		{{ partial "tnd-seo/debug.html" . }}
+*/}}
+<div class="fixed pin-r pin-b m-5 p-5 rounded bg-grey opacity-75">
+	<pre>
+		{{ partial "tnd-seo/get" . | transform.Remarshal "yaml" }}
+	</pre>
+</div>
