@@ -101,9 +101,13 @@
 		and use the first one if it has an `image` key */}}
 	{{- with .Params.images -}}
 		{{- with index . 0 -}}
-			{{- with .image -}}
+			{{ if reflect.IsMap . }}
+				{{- with .image -}}
+					{{- $img = . -}}
+				{{- end -}}
+			{{ else }}
 				{{- $img = . -}}
-			{{- end -}}
+			{{ end }}
 		{{- end -}}
 	{{- end -}}
 {{- end -}}
