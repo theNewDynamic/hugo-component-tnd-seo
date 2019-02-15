@@ -12,10 +12,11 @@
 	@example - Go Template
 		{{ partial "tnd-seo/debug.html" . }}
 */}}
-{{if ne (getenv "HUGO_ENV") "production"}}
+{{if ne (getenv "HUGO_ENV") "production" }}
 <style>
 	.tndseo-debug{
 		position: fixed;
+		z-index: 100000;
 		right:0;bottom:0;
 		margin:1rem;
 		padding:1rem;
