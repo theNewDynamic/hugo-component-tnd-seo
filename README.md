@@ -28,7 +28,7 @@ params:
     # overides .Site.Title
     site_name: MyWebsite 
     # Used for articles without images
-    default_image: "/images/aaldef-logo-45years.jpg"
+    default_image: "/images/default.jpg"
     # if true will use the SEO data object to output an json+ld script tag.
     jsonld: true
     # if true will display a human readable overlay on everypage to monitor SEO data object (only if dev != production)
