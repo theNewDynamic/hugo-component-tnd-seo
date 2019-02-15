@@ -41,10 +41,14 @@ The following can be overriden just for SEO within the Front Matter:
 
 ```
 ---
-title: That's dull!
-description: Duh!
+title: What a post
+description: That's dull!
 seo:
-  title: That's one fine superduper piece of content right there!
   image: /uploads/way-better-that-this-post-featured.png
   description: Content marketing 101
 ```
+
+## TODOS
+
+- [ ] Allow title override from Front Matter
+- [ ] Isolate title tag from og, twitter tag.
