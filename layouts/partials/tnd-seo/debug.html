@@ -12,8 +12,22 @@
 	@example - Go Template
 		{{ partial "tnd-seo/debug.html" . }}
 */}}
-<div class="fixed pin-r pin-b m-5 p-5 rounded bg-grey opacity-75">
+{{if ne (getenv "HUGO_ENV") "production"}}
+<style>
+	.tndseo-debug{
+		position: fixed;
+		right:0;bottom:0;
+		margin:1rem;
+		padding:1rem;
+		background:#f1f5f8;
+		color:black;
+		max-width:50vw;
+		opacity: .80;
+	}
+</style>
+<div class="tndseo-debug">
 	<pre>
 		{{ partial "tnd-seo/get" . | transform.Remarshal "yaml" }}
 	</pre>
 </div>
+{{ end }}
