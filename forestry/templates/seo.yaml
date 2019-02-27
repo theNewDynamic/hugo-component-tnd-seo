@@ -19,5 +19,9 @@ fields:
   - type: textarea
     name: description
     label: Description
-    description: This description will usedhen sharing on Facebook, Twitter and other
+    description: This description will used when sharing on Facebook, Twitter and other
       social media.
+  - type: text
+    name: canonical
+    label: Canonical URL
+    description: If serves duplicated content of another page, a canonical URL to said page should be set here.

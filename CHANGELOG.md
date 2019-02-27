@@ -1,3 +1,7 @@
+## [0.2.2] - 2019-02-27 (@regisphilibert)  
+
+- Add Canonical URL setting for printing rel tag.
+
 ## [0.2.1] - 2019-02-15 (@regisphilibert)
 
 - Add the "is production" test right in debug partial to prevent oversight.

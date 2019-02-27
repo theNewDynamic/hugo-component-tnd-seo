@@ -29,7 +29,9 @@
 {{- end -}}
 <meta name="twitter:card" content="{{ $seo.twitter_card }}">
 <meta name="twitter:title" content="{{- $seo.title }}">
-
+{{ with $seo.canonical }}
+	<link rel="canonical" href="{{ . }}">
+{{ end }}
 {{ with $seo.twitter_handle }}
 	<meta name="twitter:site" content="{{- . }}">
 	<meta name="twitter:creator" content="{{- . }}">

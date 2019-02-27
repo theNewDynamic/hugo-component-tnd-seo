@@ -147,7 +147,14 @@
 {{/* Locale
 	---------------------------- */}}
 {{- $.Scratch.SetInMap "seo" "locale" "en_US" -}}
- 
+
+{{/* Canonical
+---------------------------- */}}
+{{- $.Scratch.SetInMap "seo" "canonical" .Permalink -}}
+{{ with .Params.seo.canonical }}
+	{{- $.Scratch.SetInMap "seo" "canonical" (. | absURL) -}}
+{{ end }}
+
 {{/*------------------------------
 	RETRIEVING PROJECT'S OWN DATA
 	------------------------------ */}}
