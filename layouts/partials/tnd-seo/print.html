@@ -117,7 +117,7 @@
 	We can therefor safely add an imgx query to the image url.
  */}}
 {{- with .Site.Params.image_url -}}
-	{{- $query := querify "h" "800" "w" "800" "fit" "crop" -}}
+	{{- $query := querify "w" "800" "fit" "crop" -}}
 	{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
 	{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
 		{{ $img = partial "_components/image-src-imgx" (dict "src" $img "query" $query) }}
