@@ -1,5 +1,9 @@
 # TND SEO
 
+## Requirements
+
+HUGO 0.54.0 and above.
+
 ## Install
 
 ```
