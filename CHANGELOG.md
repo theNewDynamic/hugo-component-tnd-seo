@@ -1,3 +1,11 @@
+## [0.2.3] - 2019-05-09 (@regisphilibert)  
+
+- Fix the wrong order of precedence for Description field.
+
+## [0.2.2] - 2019-02-27 (@regisphilibert)  
+
+- Add Canonical URL setting for printing rel tag.
+
 ## [0.2.2] - 2019-02-27 (@regisphilibert)  
 
 - Add Canonical URL setting for printing rel tag.

@@ -41,8 +41,14 @@
 
  
 {{/* Description
-	---------------------------- */}}
-{{/* Default description is the site's description */}}
+	---------------------------- 
+	We use the following order of precedence
+	1. SEO Description, then, if not found,
+	2. Description, then if not found,
+	3. Summary then, if not found,
+	4. site description
+	
+	Default description is the site's description */}}
 {{- $.Scratch.SetInMap "seo" "description" .Site.Params.Description -}}
 
 {{/* If a .Summary is found we use it as description 
@@ -50,6 +56,12 @@
 {{- with .Summary -}}
 	{{- $.Scratch.SetInMap "seo" "description" . -}}
 {{- end -}}
+
+{{/* If the entry has a Description, we use it instead */}}
+{{- with .Params.description -}}
+	{{- $.Scratch.SetInMap "seo" "description" . -}}
+{{- end -}}
+
 
 {{/* If user's own seo description is set, we use it instead */}}
 {{- with .Params.seo.description -}}
