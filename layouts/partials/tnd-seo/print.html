@@ -30,6 +30,7 @@
 
 {{/* Dates
 	----------------------------- */}}
+
 {{- if not .PublishDate.IsZero -}}
 {{- $.Scratch.SetInMap "seo" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00") -}}
 {{- else if not .Date.IsZero -}}
@@ -49,33 +50,30 @@
 	4. site description
 	
 	Default description is the site's description */}}
-{{- $.Scratch.SetInMap "seo" "description" .Site.Params.Description -}}
-
-{{/* If a .Summary is found we use it as description 
-.Summary being built from `.Content`, list pages may not always sport one, hence this test. */}}
-{{- with .Summary -}}
-	{{- $.Scratch.SetInMap "seo" "description" . -}}
-{{- end -}}
-
-{{/* If the entry has a Description, we use it instead */}}
-{{- with .Params.description -}}
-	{{- $.Scratch.SetInMap "seo" "description" . -}}
-{{- end -}}
-
-
+{{ $description := "" }}
 {{/* If user's own seo description is set, we use it instead */}}
-{{- with .Params.seo.description -}}
-	{{- $.Scratch.SetInMap "seo" "description" . -}}
+{{- if .Params.seo.description -}}
+	{{- $description = .Params.seo.description -}}
+{{/* If the entry has a Description, we use it instead */}}
+{{- else if .Params.description -}}
+	{{- $description = .Params.description -}}
+{{/* If a .Summary is found we use it as description 
+	.Summary being built from `.Content`, list pages may not always sport one, hence this test. */}}
+{{- else if .Summary -}}
+	{{- $description = .Summary -}}
+{{- else -}}
+	{{ $description = .Site.Params.Description }}
 {{- end -}}
 
+{{- $.Scratch.SetInMap "seo" "description" $description -}}
  
 {{/* Title
 	---------------------------- */}}
-{{/* default title: {.Title} | {.Site.Title} */}}
-{{- $.Scratch.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title ) -}}
-
-{{/* Home page only needs `.Site.Title` */}}
-{{- if .IsHome -}}
+{{- if not .IsHome -}}
+	{{/* For every page except the homepage, default title: {.Title} | {.Site.Title} */}}
+	{{- $.Scratch.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title ) -}}
+{{- else -}}
+	{{/* Home page only needs `.Site.Title` */}}
 	{{- $.Scratch.SetInMap "seo" "title" .Site.Title -}}
 {{- end -}}
 
