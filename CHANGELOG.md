@@ -1,3 +1,7 @@
+## [0.2.4] - 2019-05-15 (@regisphilibert)  
+
+- Optimize code for build speed.
+
 ## [0.2.3] - 2019-05-09 (@regisphilibert)  
 
 - Fix the wrong order of precedence for Description field.
