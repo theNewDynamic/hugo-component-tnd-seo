@@ -12,10 +12,10 @@
 	@example - Go Template
 		{{ partial "tnd-seo/tags" . }}
 
-	TODO:
+  TODO:
+    - [ ] Improve type test on "events", `article` seems very opinated.
 		- [ ] Find a reasonable default image when `site.Params.default_image` is not set.
 		- [ ] Twitter can sport "author" handle on top of the site's. Devise a test for author? 
-		- [ ] Add reflect.IsSlice test before using `index` on .Params.images (once 54 is shipped)
 		- [ ] Maybe consider another approach to set the twitter_card (summary, etc...)
 		- [ ] Not sure about image size. Following https://docs.imgix.com/best-practices/improving-seo-traffic, we have a 
 			square of 800x800 */}}
@@ -47,33 +47,35 @@
 	1. SEO Description, then, if not found,
 	2. Description, then if not found,
 	3. Summary then, if not found,
-	4. site description
-	
-	Default description is the site's description */}}
+	4. site description  */}}
 {{ $description := "" }}
-{{/* If user's own seo description is set, we use it instead */}}
+{{/* 1. SEO Description */}}
 {{- if .Params.seo.description -}}
 	{{- $description = .Params.seo.description -}}
-{{/* If the entry has a Description, we use it instead */}}
+{{/* 2. Description
+	    As it could potentially contain HTML tags, we strip them with plainify */}}
 {{- else if .Params.description -}}
-	{{- $description = .Params.description -}}
-{{/* If a .Summary is found we use it as description 
-	.Summary being built from `.Content`, list pages may not always sport one, hence this test. */}}
+	{{- $description = .Params.description | plainify -}}
+{{/* 3. Summary  */}}
 {{- else if .Summary -}}
 	{{- $description = .Summary -}}
 {{- else -}}
+{{/* 4. site description  */}}
 	{{ $description = .Site.Params.Description }}
 {{- end -}}
 
 {{- $.Scratch.SetInMap "seo" "description" $description -}}
  
 {{/* Title
-	---------------------------- */}}
+  ---------------------------- 
+	We use the following logic
+	1. Every pages: `{.Title} | {.Site.Title}`
+	2. Homepage: , only {.Site.Title} */}}
 {{- if not .IsHome -}}
-	{{/* For every page except the homepage, default title: {.Title} | {.Site.Title} */}}
+	{{/* 1. `{.Title} | {.Site.Title}` */}}
 	{{- $.Scratch.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title ) -}}
 {{- else -}}
-	{{/* Home page only needs `.Site.Title` */}}
+	{{/* 2. `{.Site.Title}` */}}
 	{{- $.Scratch.SetInMap "seo" "title" .Site.Title -}}
 {{- end -}}
 
@@ -130,18 +132,16 @@
 	{{- $query := querify "w" "800" "fit" "crop" -}}
 	{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
 	{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
-		{{ $img = partial "_components/image-src-imgx" (dict "src" $img "query" $query) }}
-	{{ end }}
+		{{ $img = partialCached "_components/image-src-imgx" (dict "src" $img "query" $query) $img $query }}
 	{{/* If the project has new _images/src partial, we use it instead */}}
-	{{ if templates.Exists "partials/_images/src.html" }}
-		{{ $img = partial "_images/src" $img }}
+	{{ else if templates.Exists "partials/_images/src.html" }}
+		{{ $img = partialCached "_images/src" $img $img }}
 		{{ $img = add $img "?" }}
 		{{ $img = add $img $query }}
 	{{ end }}
 {{- end -}}
 
 {{- $.Scratch.SetInMap "seo" "image" ($img | absURL) -}}
-
 
 {{/* Type
 	---------------------------- */}}
@@ -160,9 +160,10 @@
 
 {{/* Canonical
 ---------------------------- */}}
-{{- $.Scratch.SetInMap "seo" "canonical" .Permalink -}}
 {{ with .Params.seo.canonical }}
-	{{- $.Scratch.SetInMap "seo" "canonical" (. | absURL) -}}
+  {{- $.Scratch.SetInMap "seo" "canonical" (. | absURL) -}}
+{{ else }}
+{{- $.Scratch.SetInMap "seo" "canonical" .Permalink -}}
 {{ end }}
 
 {{/*------------------------------
