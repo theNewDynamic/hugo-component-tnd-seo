@@ -1,3 +1,7 @@
+## [0.2.5] - 2019-03-06 (@regisphilibert)  
+
+- Apply safeJS to jsonified json+ld object.
+
 ## [0.2.4] - 2019-05-15 (@regisphilibert)  
 
 - Optimize code for build speed.
