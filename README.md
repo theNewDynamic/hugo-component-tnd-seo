@@ -7,7 +7,7 @@ HUGO 0.54.0 and above.
 ## Install
 
 ```
-git submodule add git@github.com:theNewDynamic/hugo-component-tnd-seo.git themes/tnd-seo/
+git submodule add https://github.com/theNewDynamic/hugo-component-tnd-seo.git components/tnd-seo/
 ```
 
 WARNING: Make sure the directory for the component is in your theme directory as `tnd-seo`
