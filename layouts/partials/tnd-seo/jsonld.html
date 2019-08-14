@@ -32,7 +32,7 @@
 
 {{- $s := newScratch -}}
 {{- $s.Set "seo" dict -}}
-{{- $s.SetInMap "seo" "@context"  "httpp://schema.org" -}}
+{{- $s.SetInMap "seo" "@context"  "https://schema.org" -}}
 {{- $s.SetInMap "seo" "@type"  .seo.type -}}
 {{- $s.SetInMap "seo" "headline" .page.Title -}}
 {{- $s.SetInMap "seo" "image" .seo.image -}}
