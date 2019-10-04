@@ -87,21 +87,10 @@
 	{{- $.Scratch.SetInMap "seo" "site_name" .Site.Title -}}
 {{- end -}}
 
-{{/* Twitter
-	---------------------------- */}}
-{{/* Default twitter_card is "summary_large_image" */}}
-{{- $.Scratch.SetInMap "seo" "twitter_card" "summary_large_image" -}}
-
-{{/* We check the site config sports a Social.twitter and use as handle */}}
-{{- with .Site.Social.twitter -}}
-	{{- $.Scratch.SetInMap "seo" "twitter_handle" (printf "@%s" .) -}}
-{{- end -}}
-
-
 {{/* Image
 	---------------------------- */}}
+{{ $img := false }}
 
-{{- $img := "/uploads/default.jpg" -}}
 {{- with .Site.Params.seo.default_image -}}
 	{{- $img = . -}}
 {{- end -}}
@@ -124,24 +113,55 @@
 	{{- end -}}
 {{- end -}}
 
-{{/* imgx: 
-	If we find an `image_url` in site config, it means we're using imgx.
-	We can therefor safely add an imgx query to the image url.
- */}}
-{{- with .Site.Params.image_url -}}
-	{{- $query := querify "w" "800" "fit" "crop" -}}
-	{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
-	{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
-		{{ $img = partialCached "_components/image-src-imgx" (dict "src" $img "query" $query) $img $query }}
-	{{/* If the project has new _images/src partial, we use it instead */}}
-	{{ else if templates.Exists "partials/_images/src.html" }}
-		{{ $img = partialCached "_images/src" $img $img }}
-		{{ $img = add $img "?" }}
-		{{ $img = add $img $query }}
+{{ with $img }}
+	{{/* imgx: 
+		If we find an `image_url` in site config, it means we're using imgx.
+		We can therefor safely add an imgx query to the image url. */}}
+	{{- with $.Site.Params.image_url -}}
+		{{- $query := querify "w" "800" "fit" "crop" -}}
+		{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
+		{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
+			{{ $img = partialCached "_components/image-src-imgx" (dict "src" $img "query" $query) $img $query }}
+		{{/* If the project has new _images/src partial, we use it instead */}}
+		{{ else if templates.Exists "partials/_images/src.html" }}
+			{{ $img = partialCached "_images/src" $img $img }}
+			{{ $img = add $img "?" }}
+			{{ $img = add $img $query }}
+		{{ end }}
+	{{- end -}}
+{{ end }}
+
+{{/* Finally if after all of the conditional above we are not able to find an image for the page,
+	we resolve to looking for the following: */}}
+{{ if not $img }}
+	{{- $img_defaults := slice "/static/logo.jpg" "/static/logo.png" "/uploads/default.jpg" -}}
+	{{ range $path := $img_defaults }}
+		{{ if fileExists . }}
+			{{ $img = strings.TrimLeft "/static" $path }}
+		{{ end }}
 	{{ end }}
+{{ end }}
+
+{{ with $img }}
+	{{- $.Scratch.SetInMap "seo" "image" (. | absURL) -}}	
+{{ end }}
+
+{{/* Twitter
+	---------------------------- */}}
+{{ with $img }}
+	{{/* Most of the time we should have an image */}}
+	{{- $.Scratch.SetInMap "seo" "twitter_card" "summary_large_image" -}}
+{{ else }}
+	{{/* For edge cases without: */}}
+	{{- $.Scratch.SetInMap "seo" "twitter_card" "summary" -}}
+{{ end }}
+
+
+{{/* We check the site config sports a Social.twitter and use as handle */}}
+{{- with .Site.Social.twitter -}}
+	{{- $.Scratch.SetInMap "seo" "twitter_handle" (printf "@%s" .) -}}
 {{- end -}}
 
-{{- $.Scratch.SetInMap "seo" "image" ($img | absURL) -}}
 
 {{/* Type
 	---------------------------- */}}

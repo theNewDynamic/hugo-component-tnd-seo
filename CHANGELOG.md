@@ -1,3 +1,7 @@
+## [0.2.6] - 2019-10-04 (@regisphilibert)  
+
+- Update "default image" logic to look for /logo.png /logo.jpg only if every other test fail. No image tag if not found.
+
 ## [0.2.5] - 2019-03-06 (@regisphilibert)  
 
 - Apply safeJS to jsonified json+ld object.
