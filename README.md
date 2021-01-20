@@ -1,3 +1,5 @@
+## DEPRECATED! Please use https://github.com/theNewDynamic/hugo-module-tnd-seo
+
 # TND SEO
 
 ## Requirements
